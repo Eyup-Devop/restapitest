@@ -13,7 +13,7 @@ on:
 env:
     CLUSTER_NAME: ${{ github.ref_name }}
     REGION: eu-central-1
-    APITEST_IMAGE: ghcr.io/Eyup-Devop/restapitest/restapitest-${{ github.ref_name }}
+    APITEST_IMAGE: ghcr.io/eyup-devop/restapitest/restapitest-${{ github.ref_name }}
     DEPLOYMENT_MANIFEST_PATH: "${{ github.workspace }}/.${{ github.ref_name }}"
     REGISTRY: ghcr.io
 
@@ -71,7 +71,7 @@ jobs:
             - name: connect to EKS cluster
               run: aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
 
-            - name: deploy respapitest manifest yaml files
+            - name: deploy restapitest manifest yaml files
               run: |
                 cd ${{ github.workspace }}/.${{ github.ref_name }}
                 kustomize edit set image ${APITEST_IMAGE}=:${{ github.sha }}

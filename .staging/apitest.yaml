@@ -28,7 +28,7 @@ spec:
           - 1.0.0.1
       containers:
         - name: api-test
-          image: ghcr.io/Eyup-Devop/restapitest/restapitest-staging:latest
+          image: ghcr.io/eyup-devop/restapitest/restapitest-staging:latest
           envFrom:
             - secretRef:
                 name: apitest-secret
