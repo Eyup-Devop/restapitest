@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
   - apitest.yaml
   - apitest-secret.yaml
-  - apitest-cm.yaml
-  - hpa-apitest.yaml
+ # - apitest-cm.yaml
+ # - hpa-apitest.yaml
 namespace: default
