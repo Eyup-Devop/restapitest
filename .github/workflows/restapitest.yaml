@@ -75,8 +75,7 @@ jobs:
               run: |
                 cd ${{ github.workspace }}/.${{ github.ref_name }}
                 kustomize edit set image ${{ env.APITEST_IMAGE }}=:${{ github.sha }}
-                ls -la
-                pwd
+                kubectl get pods -A
                 kubectl apply -k .
 
 
