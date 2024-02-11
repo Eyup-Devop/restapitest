@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: apitest-deployment
+  labels:
+    app: api-test
+spec:
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: api-test
+  template:
+    metadata:
+      labels:
+        app: api-test
+    spec:
+      imagePullSecrets:
+        - name: ghcr
+      dnsConfig:
+        nameservers:
+          - 1.1.1.1
+          - 1.0.0.1
+      containers:
+        - name: api-test
+          image: ghcr.io/Eyup-Devop/restapitest/restapitest-staging:latest
+          envFrom:
+            - secretRef:
+                name: apitest-secret
+            - configMapRef:
+                name: apitest-config
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: 150m
+            requests:
+              memory: 180Mi
+              cpu: 70m
+          ports:
+            - name: http
+              containerPort: 9090
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: default
+  name: api-test
+spec:
+  selector:
+    app: api-test
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9090
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: default
+  name: api-test-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - staging.e12test.com
+    secretName: tls-api-test
+  rules:
+    - host: staging.e12test.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-test
+                port:
+                  number: 9090
