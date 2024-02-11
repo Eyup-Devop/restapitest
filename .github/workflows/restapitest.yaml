@@ -69,12 +69,12 @@ jobs:
                 aws-region: ${{env.REGION}}
 
             - name: connect to EKS cluster
-              run: aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
+              run: aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.REGION }}
 
             - name: deploy restapitest manifest yaml files
               run: |
                 cd ${{ github.workspace }}/.${{ github.ref_name }}
-                kustomize edit set image ${APITEST_IMAGE}=:${{ github.sha }}
+                kustomize edit set image ${{ env.APITEST_IMAGE }}=:${{ github.sha }}
                 kubectl apply -k .
 
 
