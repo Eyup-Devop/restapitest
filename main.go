@@ -52,9 +52,10 @@ func CreateServer() *fiber.App {
 		Level: compress.LevelBestSpeed, // 1
 	}))
 	mainRoot.Use(RegisterAccessLogs())
+	api := mainRoot.Group("/api")
 
-	mainRoot.Get("/testapi", TestApiHandler)
-	mainRoot.Get("/connection", TestConnection)
+	api.Get("/testapi", TestApiHandler)
+	api.Get("/connection", TestConnection)
 	return mainRoot
 }
 
