@@ -8,19 +8,35 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 func init() {
 	flag.Parse()
 }
 
+var DBConn *sqlx.DB
+
 func main() {
-	connectionStr := GetEnv("CONNECTION", "example connection string not found")
+	connectionStr := GetEnv("CONNECTION_STRING", "failed to get connection string")
 	testSecret := GetEnv("TESTSECRET", "example secret not found")
-	log.Println("Connection:", connectionStr)
 	log.Println("Secret:", testSecret)
+
+	DBConn = ConnectDB(connectionStr)
+
+	defer DBConn.Close()
 	server := CreateServer()
 	Start(server)
+}
+
+func ConnectDB(connStr string) *sqlx.DB {
+	db, err := sqlx.Open("postgres", connStr)
+	if err != nil {
+		return nil
+	}
+
+	return db
 }
 
 func CreateServer() *fiber.App {
@@ -38,6 +54,7 @@ func CreateServer() *fiber.App {
 	mainRoot.Use(RegisterAccessLogs())
 
 	mainRoot.Get("/testapi", TestApiHandler)
+	mainRoot.Get("/connection", TestConnection)
 	return mainRoot
 }
 
@@ -72,6 +89,17 @@ func TestApiHandler(c *fiber.Ctx) error {
 		LastName:  "Smith",
 	}
 	return c.Status(http.StatusOK).JSON(fiber.Map{"status": "success", "data": fiber.Map{"rest_api_test": response}})
+}
+
+func TestConnection(c *fiber.Ctx) error {
+	if DBConn == nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "failed", "data": "failed to connect DB"})
+	}
+	err := DBConn.Ping()
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "failed", "data": fiber.Map{"connection_test": err.Error()}})
+	}
+	return c.Status(http.StatusOK).JSON(fiber.Map{"status": "success", "data": "connected"})
 }
 
 func GetEnv(key string, fallback string) string {
