@@ -1,0 +1,4 @@
+.staging/apitest-cm.yaml
+.staging/apitest-secret.yaml
+temp
+.vscode
