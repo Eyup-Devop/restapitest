@@ -7,7 +7,7 @@ on:
     - staging
   workflow_dispatch:
 env:
-  CLUSTER_NAME: format('{0}_CLUSTER_NAME', ${{ github.ref_name }})
+  CLUSTER_NAME: ${{ format('secret.{0}_CLUSTER_NAME', ${{ github.ref_name }}) }}
 jobs:
   build:
     runs-on: ubuntu-latest
