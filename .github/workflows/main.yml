@@ -15,3 +15,8 @@ jobs:
       run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
     - name: Test
       run: echo $GITHUB_SHA_SHORT
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Test
+      run: echo $GITHUB_SHA_SHORT
