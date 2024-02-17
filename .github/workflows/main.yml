@@ -6,8 +6,6 @@ on:
     - preprod
     - staging
   workflow_dispatch:
-env:
-  CLUSTER_NAME_SECRET=$(echo "${{ format('secret.{0}_CLUSTER_NAME', github.ref_name) }}")
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,4 +20,4 @@ jobs:
     steps:
     - name: Test
       run: |
-        echo $CLUSTER_NAME_SECRET
+        echo "${{ format('secret.{0}_CLUSTER_NAME', github.ref_name) }}"
